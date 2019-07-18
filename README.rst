@@ -6,8 +6,9 @@ CellGrid
 .. image:: https://img.shields.io/pypi/v/cellgrid.svg
         :target: https://pypi.python.org/pypi/cellgrid
 
-.. image:: https://img.shields.io/travis/nehcgnay/cellgrid.svg
-        :target: https://travis-ci.org/nehcgnay/cellgrid
+
+.. image:: https://travis-ci.org/Brodinlab/cellgrid.svg?branch=master
+        :target: https://travis-ci.org/Brodinlab/cellgrid
 
 .. image:: https://readthedocs.org/projects/cellgrid/badge/?version=latest
         :target: https://cellgrid.readthedocs.io/en/latest/?badge=latest
