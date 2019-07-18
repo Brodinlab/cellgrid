@@ -1,0 +1,37 @@
+========
+CellGrid
+========
+
+
+.. image:: https://img.shields.io/pypi/v/cellgrid.svg
+        :target: https://pypi.python.org/pypi/cellgrid
+
+.. image:: https://img.shields.io/travis/nehcgnay/cellgrid.svg
+        :target: https://travis-ci.org/nehcgnay/cellgrid
+
+.. image:: https://readthedocs.org/projects/cellgrid/badge/?version=latest
+        :target: https://cellgrid.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
+
+
+
+Cell classification by learning known phenotypes
+
+
+* Free software: MIT license
+* Documentation: https://cellgrid.readthedocs.io.
+
+
+Features
+--------
+
+* TODO
+
+Credits
+-------
+
+This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
