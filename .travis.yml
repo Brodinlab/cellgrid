@@ -12,9 +12,6 @@ matrix:
     sudo: true
 install: pip install -U tox-travis
 script: tox
-branches:
-  only:
-  - master
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
