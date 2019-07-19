@@ -1,38 +1,26 @@
-# Config file for automatic testing at travis-ci.org
-
 language: python
 matrix:
   include:
-    - python: 2.7
-      dist: trusty
-      sudo: false
-    - python: 3.6
-      dist: trusty
-      sudo: false
-    - python: 3.7
-      dist: xenial
-      sudo: true
-
-# Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+  - python: 2.7
+    dist: trusty
+    sudo: false
+  - python: 3.6
+    dist: trusty
+    sudo: false
+  - python: 3.7
+    dist: xenial
+    sudo: true
 install: pip install -U tox-travis
-
-# Command to run tests, e.g. python setup.py test
 script: tox
-
-# Assuming you have installed the travis-ci CLI tool, after you
-# create the Github repo and add it to Travis, run the
-# following command to finish PyPI deployment setup:
-# $ travis encrypt --add deploy.password
 branches:
   only:
   - master
-
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
   user: yang.chen
   password:
-    secure: qr4U589u6YrAI9L9CT8C3AsivU1oawqpaIG76nszw9klNdNJ479dKQ38+K8j2Dt1e9B01W0PRNGLrjAcbKFsL5qVU00shx6CmgZXr2TLyH+88K5T7cDPIN3P+NDzu0ZLAYMGYSimCrlnBGIJuMriikLh7RS+ldkQSEBfI6OAQje37/Hf3l5sIVAxgNMM3DhoKP4+gnNcl5MIGOqJB7TQPHH7RJEin8S+KiWjgTygdq9wHXkwEKxjq8jddPqkmKxBRs9iKR/PV6A6DvmaaqRa5t2CCopLz7QiSn/pUbyKTf7c+a37VDuiYrZ8BwNREuX85C2zyayrbYbsenB4gMaC4GKeYl+Z0yIFEx2uUY6z1liFctJr8tlu98tZrKkYBomaUtrh2UEEVK9GGgPyBtdvPMoOshEOzLSVE4isuxZhYdE0skkPDhscpRT2tMZqjiqA9dUhFkFDZyGXD7NORKUUWwTfZeM5y4RmxzkLxK2fga3mwbqPwftPnsfwzGrAkEXprofNNpYhLg0NXalpZyWMHKwykwWBI9lhnYrJbLO8ce4LPaNbUyMixf+eYBmCXR/9iuVk0ADVBY4On0X36MjTx8KglQkcWaMIkbpwBITUW4D1FU1v6u9JgW8p/S9Z2LO2p0Ex5hcqjYcOkd3KV/OWFS0Y07iZ4kQ2cRY7PH1eD6E=
+    secure: TDNjrJpkX8fnqPlgPaHF+q49BwNPXL+cWRwrfdE+4YlJnEVelqGHCdM+/uAKZX9t7QU+lp/YSIe82/xnLV1O7Ct+qmX2ZsWDi8BC8gB1IJxxriOb9lSseAZ/sm7u+9zQQCsi575b7KsvsbzaWO0aWVTDd5VLWatDzzK7eYxnyC+GOjlqJeQCIclKYnkE7ooDDg2z/7Z2WBD1/+S3N5A5F0O4uf8WvmleK0snEBUXyN/Kn7K/DtrysPMKrQkn+9te9lNZl5+g9kSxpg8wBg0qjsG8ZYuOWga35jgz8cd1ehLBkkjknxBW97HtoHVtO9yaQFySe6Yz8xobA+AIEgLMHREHvHqvd5dHoFr2LQ8WSFlkSZH9Myv0KPHu5M8ocUkWDTY+rO4H8yh5PqFKq3yXM9dL+0qWFPqH9McL0wDucuoJIY/fEtgEqkUxGy9HYyqpx7lVctv/5I8zi5p51wReJrBxqh39oMpjR+pB5DeEoNixIOtn/OhhU+DjLawyv1OEobKecdMqoKriO69Imh65GwCrLNnSPMIJ6rRRNcOvfL1skaL0JMwJEDDO0JbhgUB0hfxSd2rTzB366rQhSqd4I0Iv4dBng8GIRv8daEb+yB+bfL0h3E7a1dGZ8v4PyJoXUzlLUxf9hcXiSexNz2HpE6Av1jJ4IIbUEaGRytrjGtI=
   skip_cleanup: true
   on:
     tags: true
