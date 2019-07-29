@@ -24,10 +24,18 @@ Cell classification by learning known phenotypes
 * Documentation: https://cellgrid.readthedocs.io.
 
 
-Features
+Usage
 --------
 
-* TODO
+Schema
+******
+
+A list of objects that defines name, parent, markers and the model class.
+
+y_train
+*******
+A (pandas) data frame that contains the layered labels.
+
 
 Credits
 -------
