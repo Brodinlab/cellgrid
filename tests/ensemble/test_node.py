@@ -1,4 +1,5 @@
 import pandas as pd
+from xgboost import XGBClassifier
 from pandas.util.testing import assert_index_equal, assert_series_equal
 from cellgrid.ensemble.node import *
 from cellgrid.ensemble import Schema
@@ -6,7 +7,13 @@ from cellgrid.ensemble import Schema
 
 class TestNode:
     def setup_method(self):
-        self.node = ModelNode('test', ['a', 'b'])
+        self.x_train = pd.DataFrame([[1, 2, 3],
+                                     [4, 5, 6],
+                                     [7, 8, 9]],
+                                    columns=list('abc'))
+        self.y_train = ['a', 'a', 'b']
+        self.node = ModelNode('test', ['a', 'b'], model_class='xgb',
+                              x_train=self.x_train, y_train=self.y_train)
 
     def test_set_xtrain(self):
         self.node.x_train = 'x_train'
@@ -15,6 +22,10 @@ class TestNode:
     def test_set_ytrain(self):
         self.node.y_train = 'y_train'
         assert self.node.y_train == 'y_train'
+
+    def test_fit(self):
+        self.node.fit()
+        assert isinstance(self.node._model_ins, XGBClassifier)
 
 
 class TestNodeManager:

@@ -1,3 +1,6 @@
+from xgboost import XGBClassifier
+
+
 class NodesTrainer:
     def __init__(self, schema):
         self.schema = schema
@@ -36,7 +39,8 @@ class NodesTrainer:
         return blocks
 
     def fit(self):
-        pass
+        for node in self.nm.walk():
+            node.fit()
 
 
 class NodeManager:
@@ -97,3 +101,20 @@ class ModelNode:
     @y_train.setter
     def y_train(self, y_train):
         self._y_train = y_train
+
+    def fit(self):
+        model_map = {
+            'xgb': {
+                'model_class': XGBClassifier,
+                'params': {
+                    'nthread': 10,
+                    'max_depth': 10,
+                    'n_estimators': 40
+                }
+            }
+        }
+
+        model_class = model_map[self._model_class]['model_class']
+        params = model_map[self._model_class]['params']
+        self._model_ins = model_class(**params)
+        self._model_ins.fit(self._x_train, self._y_train)
