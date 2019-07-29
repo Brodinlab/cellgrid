@@ -9,22 +9,29 @@ class NodesTrainer:
                         row['model_class'], row['markers'])
 
     def update_node_data(self, x_train, y_train):
-        blocks = [{'name': 'all-events', 'index': y_train.index, 'parent': None}]
+        blocks = [
+            {'name': 'all-events',
+             'index': y_train.index,
+             'parent': None}
+        ]
         for column in y_train:
             new_blocks = list()
             for block in blocks:
                 x_train_block = x_train.loc[block['index']]
                 y_train_block = y_train.loc[block['index'], column]
-                self.nm.update_node_data(block['name'], x_train_block, y_train_block)
+                if len(y_train_block.unique()) != 1:
+                    self.nm.update_node_data(block['name'], x_train_block, y_train_block)
                 new_blocks += self.create_new_block(y_train_block, block['parent'])
             blocks = new_blocks
 
-    def create_new_block(self, y_train, parent):
+    @staticmethod
+    def create_new_block(y_train, parent):
         series_y = y_train
         blocks = list()
         for name in series_y.unique():
+            index = series_y[series_y == name].index
             blocks.append({'name': name,
-                           'index': series_y[series_y == name].index,
+                           'index': index,
                            'parent': parent})
         return blocks
 
