@@ -12,7 +12,8 @@ class GridClassifier:
         self.nt.update_node_data(x_train, y_train)
         self.nt.fit()
 
-    def score(self):
+    def score(self, x_test, y_test):
+        self.nt.update_node_data(x_test, y_test)
         return self.nt.score()
 
 

@@ -19,4 +19,9 @@ class TestGridSchema:
         schema = GridSchema.from_json()
         clf = GridClassifier(schema)
         clf.fit(x_train, y_train)
-        print(clf.score())
+        r = clf.score(x_train, y_train)
+
+        assert list(r.keys()) == ['all-events', 'cells', 'CD4T', 'B',
+                                  'gdT', 'NK', 'CD8T', 'Monocytes']
+        for v in r.values():
+            assert v > 0.9
