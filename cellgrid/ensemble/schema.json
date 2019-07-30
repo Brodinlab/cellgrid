@@ -2,6 +2,7 @@
     {
         "name": "all-events",
         "parent": null,
+        "model_class": "xgb",
         "markers": [
             "Ce140Di",
             "Ir191Di"
@@ -10,6 +11,7 @@
     {
         "name": "cells",
         "parent": "all-events",
+        "model_class": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -50,43 +52,11 @@
             "CD11b"
         ]
     },
-    {
-        "name": "pDC",
-        "parent": "cells",
-        "markers": [
-            "HLA-ABC",
-            "CD45",
-            "CD5",
-            "CD16",
-            "CD4",
-            "CD11c",
-            "CD31",
-            "CD64",
-            "CD123",
-            "CD13",
-            "CD7",
-            "CD26",
-            "CD9",
-            "CD22",
-            "CD14",
-            "CD161",
-            "CD29",
-            "HLA-DR",
-            "CD44",
-            "CD127",
-            "CD24",
-            "CD27",
-            "CD38",
-            "CD45RA",
-            "CD33",
-            "CD99",
-            "CD39",
-            "CD11b"
-        ]
-    },
+
     {
         "name": "CD4T",
         "parent": "cells",
+        "model_class": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -117,6 +87,7 @@
     {
         "name": "B",
         "parent": "cells",
+        "model_class": "xgb",
         "markers": [
             "HLA-ABC",
             "CD45",
@@ -144,23 +115,9 @@
         ]
     },
     {
-        "name": "Neutrophils",
-        "parent": "cells",
-        "markers": [
-            "CD45",
-            "CD16",
-            "CD11c",
-            "CD13",
-            "CD44",
-            "CD24",
-            "CD33",
-            "CD15",
-            "CD26"
-        ]
-    },
-    {
         "name": "gdT",
         "parent": "cells",
+        "model_class": "xgb",
         "markers": [
             "HLA-ABC",
             "CD45",
@@ -193,6 +150,7 @@
     {
         "name": "NK",
         "parent": "cells",
+        "model_class": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -224,42 +182,9 @@
         ]
     },
     {
-        "name": "MAIT",
-        "parent": "cells",
-        "markers": [
-            "HLA-ABC",
-            "CD45",
-            "CD57",
-            "CD5",
-            "CD16",
-            "CD4",
-            "CD8a",
-            "CD11c",
-            "CD31",
-            "CD25",
-            "CD38",
-            "HLA-DR",
-            "CD3e",
-            "CD13",
-            "CD7",
-            "CD26",
-            "CD9",
-            "CD22",
-            "CD161",
-            "CD29",
-            "CD44",
-            "CD24",
-            "CD127",
-            "CD45RA",
-            "CD56",
-            "CD99",
-            "CD39",
-            "CD11b"
-        ]
-    },
-    {
         "name": "CD8T",
         "parent": "cells",
+        "model_class": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -290,6 +215,7 @@
     {
         "name": "Monocytes",
         "parent": "cells",
+        "model_class": "xgb",
         "markers": [
             "HLA-ABC",
             "CD45",
@@ -311,28 +237,6 @@
             "CD99",
             "CD39",
             "CD11b"
-        ]
-    },
-    {
-        "name": "basophils",
-        "parent": "cells",
-        "markers": [
-            "CD45",
-            "CD16",
-            "CD123",
-            "HLA-ABC",
-            "CD11c",
-            "CD11b",
-            "CD13",
-            "CD31",
-            "CD25",
-            "CD9",
-            "CD26",
-            "CD29",
-            "CD44",
-            "CD38",
-            "CD33",
-            "CD99"
         ]
     }
 ]

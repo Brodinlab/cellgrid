@@ -1,4 +1,5 @@
 from xgboost import XGBClassifier
+from sklearn.metrics.scorer import check_scoring
 
 
 class NodesTrainer:
@@ -23,8 +24,11 @@ class NodesTrainer:
                 x_train_block = x_train.loc[block['index']]
                 y_train_block = y_train.loc[block['index'], column]
                 if len(y_train_block.unique()) != 1:
-                    self.nm.update_node_data(block['name'], x_train_block, y_train_block)
-                new_blocks += self.create_new_block(y_train_block, block['parent'])
+                    self.nm.update_node_data(block['name'],
+                                             x_train_block,
+                                             y_train_block)
+                new_blocks += self.create_new_block(y_train_block,
+                                                    block['parent'])
             blocks = new_blocks
 
     @staticmethod
@@ -41,6 +45,12 @@ class NodesTrainer:
     def fit(self):
         for node in self.nm.walk():
             node.fit()
+
+    def score(self):
+        r = dict()
+        for node in self.nm.walk():
+            r[node.name] = node.score()
+        return r
 
 
 class NodeManager:
@@ -107,7 +117,7 @@ class ModelNode:
             'xgb': {
                 'model_class': XGBClassifier,
                 'params': {
-                    'nthread': 10,
+                    'n_jobs': 10,
                     'max_depth': 10,
                     'n_estimators': 40
                 }
@@ -117,4 +127,9 @@ class ModelNode:
         model_class = model_map[self._model_class]['model_class']
         params = model_map[self._model_class]['params']
         self._model_ins = model_class(**params)
-        self._model_ins.fit(self._x_train, self._y_train)
+        self._model_ins.fit(self._x_train[self._markers], self._y_train)
+
+    def score(self):
+        return check_scoring(self._model_ins)(self._model_ins,
+                                              self._x_train[self._markers],
+                                              self._y_train)

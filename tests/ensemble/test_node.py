@@ -11,7 +11,7 @@ class TestNode:
                                      [4, 5, 6],
                                      [7, 8, 9]],
                                     columns=list('abc'))
-        self.y_train = ['a', 'a', 'b']
+        self.y_train = pd.Series(['a', 'a', 'b'])
         self.node = ModelNode('test', ['a', 'b'], model_class='xgb',
                               x_train=self.x_train, y_train=self.y_train)
 
