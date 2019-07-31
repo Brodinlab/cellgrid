@@ -1,6 +1,22 @@
 import os
+import pytest
 import pandas as pd
 from cellgrid.ensemble import *
+
+clf = None
+
+
+@pytest.fixture(scope="module", autouse=True)
+def fit():
+    f = os.path.join(os.getcwd(),
+                     'tests', 'cellgrid_test.csv')
+    df = pd.read_csv(f)
+    y_train = df[['level0', 'level1', 'level2']]
+    x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
+    schema = GridSchema.from_json()
+    global clf
+    clf = GridClassifier(schema)
+    clf.fit(x_train, y_train)
 
 
 class TestGridSchema:
@@ -16,12 +32,21 @@ class TestGridSchema:
         df = pd.read_csv(f)
         y_train = df[['level0', 'level1', 'level2']]
         x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
-        schema = GridSchema.from_json()
-        clf = GridClassifier(schema)
-        clf.fit(x_train, y_train)
         r = clf.score(x_train, y_train)
 
-        assert list(r.keys()) == ['all-events', 'cells', 'CD4T', 'B',
-                                  'gdT', 'NK', 'CD8T', 'Monocytes']
+        assert list(r.keys()) == ['all-events', 'cells', 'B', 'CD4T',
+                                  'CD8T', 'Monocytes', 'NK', 'gdT']
         for v in r.values():
             assert v > 0.9
+
+    def test_predict(self):
+        f = os.path.join(os.getcwd(),
+                         'tests', 'cellgrid_test.csv')
+        df = pd.read_csv(f)
+        y_train = df[['level0', 'level1', 'level2']]
+        x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
+
+        y = clf.predict(x_train)
+        print(y['level1'].unique())
+        print(y['level0'].unique())
+        assert set(y['level2'].unique()) == set(df['level2'].unique())

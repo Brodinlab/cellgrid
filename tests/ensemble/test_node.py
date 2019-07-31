@@ -40,15 +40,23 @@ class TestNodeManager:
         node2 = nm.get_node('test2')
         assert node2.name == 'test2'
 
-    def test_walk(self):
+    def test_build_level_and_walk(self):
         nm = NodeManager()
-        nm.add('test', None, 'model_class', 'markers')
-        nm.add('test2', 'test', 'model_class', 'markers')
-        nm.add('test3', 'test', 'model_class', 'markers')
-        nm.add('test4', 'test3', 'model_class', 'markers')
-
-        r = [i.name for i in nm.walk()]
-        assert r == ['test', 'test2', 'test3', 'test4']
+        nm.add('test11', 'test0', 'model_class', 'markers')
+        nm.add('test0', None, 'model_class', 'markers')
+        nm.add('test111', 'test11', 'model_class', 'markers')
+        nm.add('test12', 'test0', 'model_class', 'markers')
+        nm.add('test112', 'test11', 'model_class', 'markers')
+        nm.add('test121', 'test12', 'model_class', 'markers')
+        nm.build_level()
+        r = [(i.name, i.level) for i in nm.walk()]
+        assert r == [('test0', 0),
+                     ('test11', 1),
+                     ('test12', 1),
+                     ('test111', 2),
+                     ('test112', 2),
+                     ('test121', 2),
+                     ]
 
 
 class TestNodeTrainer:

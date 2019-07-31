@@ -16,6 +16,9 @@ class GridClassifier:
         self.nt.update_node_data(x_test, y_test)
         return self.nt.score()
 
+    def predict(self, x):
+        return self.nt.predict(x)
+
 
 class Schema:
     def __init__(self, schema):
