@@ -23,13 +23,11 @@ class GridClassifier:
 
 class Schema:
     def __init__(self, schema):
-        self.schema = schema
+        self.__schema = schema
 
     def get(self):
-        return self.schema
+        return self.__schema
 
-
-class GridSchema(Schema):
     @classmethod
     def from_json(cls, filepath=None):
         if filepath is None:
@@ -38,7 +36,7 @@ class GridSchema(Schema):
 
         with open(filepath, 'rb') as fp:
             schema = json.load(fp)
-        return GridSchema(schema)
+        return Schema(schema)
 
 
 def save_model(model, path):

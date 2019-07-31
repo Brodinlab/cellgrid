@@ -18,15 +18,15 @@ def fit():
 
     y_train = df[['level0', 'level1', 'level2']]
     x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
-    schema = GridSchema.from_json()
+    schema = Schema.from_json()
     clf = GridClassifier(schema)
     clf.fit(x_train, y_train)
 
 
-class TestGridSchema:
+class TestSchema:
     def test_from_json(self):
-        schema = GridSchema.from_json()
-        assert isinstance(schema, GridSchema)
+        schema = Schema.from_json()
+        assert isinstance(schema, Schema)
         assert len(schema.get()) == 8
         assert schema.get()[0]['parent'] is None
 

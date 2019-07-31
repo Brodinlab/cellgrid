@@ -1,5 +1,5 @@
-from .classifier import Schema, GridSchema, \
+from .classifier import Schema, \
     GridClassifier, save_model, load_model
 
-__all__ = ['Schema', 'GridSchema', 'GridClassifier',
+__all__ = ['Schema', 'GridClassifier',
            'save_model', 'load_model']
