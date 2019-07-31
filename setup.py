@@ -13,6 +13,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'fcsy>=0.3.0',
+    'numpy>=1.16.0',
     'pandas==0.24.2',
     'scikit-learn',
     'xgboost>=0.9.0'

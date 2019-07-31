@@ -43,10 +43,10 @@ class TestGridSchema:
         f = os.path.join(os.getcwd(),
                          'tests', 'cellgrid_test.csv')
         df = pd.read_csv(f)
-        y_train = df[['level0', 'level1', 'level2']]
         x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
 
         y = clf.predict(x_train)
-        print(y['level1'].unique())
-        print(y['level0'].unique())
-        assert set(y['level2'].unique()) == set(df['level2'].unique())
+        for i in range(3):
+            label = 'level{}'.format(i)
+            assert set(y[label].unique()) == set(df[label].unique())
+

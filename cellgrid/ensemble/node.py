@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from xgboost import XGBClassifier
 from sklearn.metrics.scorer import check_scoring
@@ -74,7 +75,7 @@ class NodesTrainer:
             else:
                 df.loc[y.index, level_label] = y
 
-        return df
+        return df.replace(np.nan, ' ')
 
 
 class NodeManager:
