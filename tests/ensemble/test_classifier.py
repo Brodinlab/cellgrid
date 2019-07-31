@@ -1,5 +1,6 @@
 import os
 import pytest
+import tempfile
 import pandas as pd
 from cellgrid.ensemble import *
 
@@ -49,4 +50,23 @@ class TestGridSchema:
         for i in range(3):
             label = 'level{}'.format(i)
             assert set(y[label].unique()) == set(df[label].unique())
+
+    def test_save_and_load(self):
+        f = os.path.join(os.getcwd(),
+                         'tests', 'cellgrid_test.csv')
+        df = pd.read_csv(f)
+        x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
+        y_train = df[['level0', 'level1', 'level2']]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            f = os.path.join(tmpdir, 'model.txt')
+            save_model(clf, f)
+            clf2 = load_model(f)
+            r = clf.score(x_train, y_train)
+            assert list(r.keys()) == ['all-events', 'cells', 'B', 'CD4T',
+                                      'CD8T', 'Monocytes', 'NK', 'gdT']
+            for v in r.values():
+                assert v > 0.9
+
+
+
 

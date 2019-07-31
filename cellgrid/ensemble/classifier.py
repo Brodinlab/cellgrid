@@ -1,5 +1,6 @@
 import os
 import json
+import pickle
 from .node import NodesTrainer
 
 
@@ -38,3 +39,14 @@ class GridSchema(Schema):
         with open(filepath, 'rb') as fp:
             schema = json.load(fp)
         return GridSchema(schema)
+
+
+def save_model(model, path):
+    with open(path, 'wb') as fp:
+        pickle.dump(model, fp)
+
+
+def load_model(path):
+    with open(path, 'rb') as fp:
+        model = pickle.load(fp)
+    return model
