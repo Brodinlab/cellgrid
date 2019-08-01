@@ -13,3 +13,6 @@ class TestSchema:
         bp = ModelBlueprint('test', 'markers', 'xgb', None)
         xgb = GridSchema.create_model(bp)
         assert isinstance(xgb, XgbModel)
+        assert xgb._model_ins.n_jobs == 10
+        assert xgb._model_ins.max_depth == 10
+        assert xgb._model_ins.n_estimators == 40
