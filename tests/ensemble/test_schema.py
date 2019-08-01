@@ -29,4 +29,23 @@ class TestSchema:
         schema.add_model(xgb2)
         assert schema._model_dict['test']['children'] == ['test2']
 
+    def test_build_and_walk(self):
+        bps = [
+            ModelBlueprint('test11', 'markers', 'xgb', 'test0'),
+            ModelBlueprint('test0', 'markers', 'xgb', None),
+            ModelBlueprint('test111', 'markers', 'xgb', 'test11'),
+            ModelBlueprint('test12', 'markers', 'xgb', 'test0'),
+            ModelBlueprint('test112', 'markers', 'xgb', 'test11'),
+            ModelBlueprint('test121', 'markers', 'xgb', 'test12')
+        ]
+        schema = GridSchema(bps)
+        r = [(i.name, i.level) for i in schema.walk()]
+        assert r == [('test0', 0),
+                     ('test11', 1),
+                     ('test12', 1),
+                     ('test111', 2),
+                     ('test112', 2),
+                     ('test121', 2),
+                     ]
+
 

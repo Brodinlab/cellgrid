@@ -13,7 +13,7 @@ class Schema(abc.ABC):
         self._ready = False
         self._model_dict = {None: {'model': None, 'children': []}}
         for bp in model_blueprints:
-            model = Schema.create_model(bp)
+            model = self.create_model(bp)
             self.add_model(model)
         self.build()
 
@@ -70,7 +70,10 @@ class GridSchema(Schema):
         return GridSchema(bps)
 
     def walk(self):
-        pass
+        models = self._model_dict[None]['children'].copy()
+        for name in models:
+            yield self._model_dict[name]['model']
+            models.extend(sorted(self._model_dict[name]['children']))
 
     def add_model(self, model):
         if model.parent in self._model_dict:
