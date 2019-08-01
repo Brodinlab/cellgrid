@@ -2,7 +2,7 @@
     {
         "name": "all-events",
         "parent": null,
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "Ce140Di",
             "Ir191Di"
@@ -11,7 +11,7 @@
     {
         "name": "cells",
         "parent": "all-events",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -56,7 +56,7 @@
     {
         "name": "CD4T",
         "parent": "cells",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -87,7 +87,7 @@
     {
         "name": "B",
         "parent": "cells",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "HLA-ABC",
             "CD45",
@@ -117,7 +117,7 @@
     {
         "name": "gdT",
         "parent": "cells",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "HLA-ABC",
             "CD45",
@@ -150,7 +150,7 @@
     {
         "name": "NK",
         "parent": "cells",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -184,7 +184,7 @@
     {
         "name": "CD8T",
         "parent": "cells",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "CD45",
             "HLA-ABC",
@@ -215,7 +215,7 @@
     {
         "name": "Monocytes",
         "parent": "cells",
-        "model_class": "xgb",
+        "model_class_name": "xgb",
         "markers": [
             "HLA-ABC",
             "CD45",
