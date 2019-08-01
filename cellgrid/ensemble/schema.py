@@ -2,7 +2,7 @@ import os
 import json
 import abc
 from collections import namedtuple
-from xgboost import XGBClassifier
+from .model import *
 
 ModelBlueprint = namedtuple('ModelBlueprint', ['name', 'markers', 'model_class_name', 'parent'])
 
@@ -11,7 +11,7 @@ class Schema(abc.ABC):
     def __init__(self, model_blueprints):
         self._ready = False
         for bp in model_blueprints:
-            model = self.create_model(bp)
+            model = Schema.create_model(bp)
             self.add_model(model)
         self.build()
 
@@ -19,8 +19,9 @@ class Schema(abc.ABC):
     def ready(self):
         return self._ready
 
+    @classmethod
     @abc.abstractmethod
-    def create_model(self, model_class_name):
+    def create_model(cls, bp):
         pass
 
     @abc.abstractmethod
@@ -75,18 +76,13 @@ class GridSchema(Schema):
     def create_data_map(self, x_train, y_train):
         pass
 
-    def create_model(self, model_class_name):
+    @classmethod
+    def create_model(cls, bp):
         model_map = {
-            'xgb': {
-                'model_class': XGBClassifier,
-                'params': {
-                    'n_jobs': 10,
-                    'max_depth': 10,
-                    'n_estimators': 40
-                }
-            }
+            'xgb': XgbModel
         }
-
+        model_class = model_map[bp.model_class_name]
+        return model_class(bp.name, bp.markers)
 
     def build(self):
         pass
