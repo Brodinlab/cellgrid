@@ -4,10 +4,11 @@ from xgboost import XGBClassifier
 
 
 class Model(abc.ABC):
-    def __init__(self, name, markers, level=None, **kwargs):
-        self._name = name
-        self._markers = markers
-        self._level = level
+    def __init__(self, name, markers, parent, level=None, **kwargs):
+        self.name = name
+        self.markers = markers
+        self.parent = parent
+        self.level = level
         self._model_ins = self.init_model_instance(**kwargs)
 
     @abc.abstractmethod
@@ -15,15 +16,15 @@ class Model(abc.ABC):
         pass
 
     def fit(self, x_train, y_train):
-        self._model_ins.fit(x_train[self._markers], y_train)
+        self._model_ins.fit(x_train[self.markers], y_train)
 
     def score(self, x_train, y_train):
         return check_scoring(self._model_ins)(self._model_ins,
-                                              x_train[self._markers],
+                                              x_train[self.markers],
                                               y_train)
 
     def predict(self, x):
-        return self._model_ins.predict(x[self._markers])
+        return self._model_ins.predict(x[self.markers])
 
 
 class XgbModel(Model):

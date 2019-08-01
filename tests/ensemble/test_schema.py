@@ -3,9 +3,9 @@ from cellgrid.ensemble.model import XgbModel
 
 
 class TestSchema:
-    def test_from_json(self):
-        schema = GridSchema.from_json()
-        assert isinstance(schema, GridSchema)
+    #def test_from_json(self):
+    #    schema = GridSchema.from_json()
+    #    assert isinstance(schema, GridSchema)
         # assert len(schema.get()) == 8
         # assert schema.get()[0]['parent'] is None
 
@@ -16,3 +16,17 @@ class TestSchema:
         assert xgb._model_ins.n_jobs == 10
         assert xgb._model_ins.max_depth == 10
         assert xgb._model_ins.n_estimators == 40
+
+    def test_add_node(self):
+        schema = GridSchema([])
+        bp = ModelBlueprint('test', 'markers', 'xgb', None)
+        xgb = GridSchema.create_model(bp)
+        schema.add_model(xgb)
+        assert xgb == schema._model_dict['test']['model']
+
+        bp2 = ModelBlueprint('test2', 'markers', 'xgb', 'test')
+        xgb2 = GridSchema.create_model(bp2)
+        schema.add_model(xgb2)
+        assert schema._model_dict['test']['children'] == ['test2']
+
+

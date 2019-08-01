@@ -2,14 +2,16 @@ import os
 import json
 import abc
 from collections import namedtuple
-from .model import *
+from .model import XgbModel
 
-ModelBlueprint = namedtuple('ModelBlueprint', ['name', 'markers', 'model_class_name', 'parent'])
+ModelBlueprint = namedtuple('ModelBlueprint',
+                            ['name', 'markers', 'model_class_name', 'parent'])
 
 
 class Schema(abc.ABC):
     def __init__(self, model_blueprints):
         self._ready = False
+        self._model_dict = {None: {'model': None, 'children': []}}
         for bp in model_blueprints:
             model = Schema.create_model(bp)
             self.add_model(model)
@@ -71,7 +73,15 @@ class GridSchema(Schema):
         pass
 
     def add_model(self, model):
-        pass
+        if model.parent in self._model_dict:
+            self._model_dict[model.parent]['children'].append(model.name)
+        else:
+            self._model_dict[model.parent] = {'node': None, 'children': [model.name]}
+
+        if model.name in self._model_dict:
+            self._model_dict[model.name]['model'] = model
+        else:
+            self._model_dict[model.name] = {'model': model, 'children': []}
 
     def create_data_map(self, x_train, y_train):
         pass
@@ -82,7 +92,15 @@ class GridSchema(Schema):
             'xgb': XgbModel
         }
         model_class = model_map[bp.model_class_name]
-        return model_class(bp.name, bp.markers)
+        return model_class(bp.name, bp.markers, bp.parent)
 
-    def build(self):
-        pass
+    def build(self, level=0, models=None):
+        if models is None:
+            models = self._model_dict[None]['children'].copy()
+        for name in models:
+            model = self._model_dict[name]['model']
+            model.level = level
+            children = self._model_dict[name]['children']
+            if len(children) > 0:
+                self.build(level=level + 1, models=children)
+
