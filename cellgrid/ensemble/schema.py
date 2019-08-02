@@ -87,7 +87,33 @@ class GridSchema(Schema):
             self._model_dict[model.name] = {'model': model, 'children': []}
 
     def create_data_map(self, x_train, y_train):
-        pass
+        r = dict()
+        blocks = [
+            {'name': 'all-events',
+             'index': y_train.index,
+             'parent': None}
+        ]
+        for column in y_train:
+            new_blocks = list()
+            for block in blocks:
+                x_train_block = x_train.loc[block['index']]
+                y_train_block = y_train.loc[block['index'], column]
+                if len(y_train_block.unique()) != 1:
+                    r[block['name']] = x_train_block, y_train_block
+                new_blocks += self.create_new_block(y_train_block,
+                                                    block['parent'])
+            blocks = new_blocks
+        return r
+
+    def create_new_block(self, y_train, parent):
+        series_y = y_train
+        blocks = list()
+        for name in series_y.unique():
+            index = series_y[series_y == name].index
+            blocks.append({'name': name,
+                           'index': index,
+                           'parent': parent})
+        return blocks
 
     @classmethod
     def create_model(cls, bp):

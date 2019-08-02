@@ -1,13 +1,15 @@
+import pandas as pd
+from pandas.util.testing import assert_series_equal
 from cellgrid.ensemble import GridSchema, ModelBlueprint
 from cellgrid.ensemble.model import XgbModel
 
 
 class TestSchema:
-    #def test_from_json(self):
+    # def test_from_json(self):
     #    schema = GridSchema.from_json()
     #    assert isinstance(schema, GridSchema)
-        # assert len(schema.get()) == 8
-        # assert schema.get()[0]['parent'] is None
+    # assert len(schema.get()) == 8
+    # assert schema.get()[0]['parent'] is None
 
     def test_create_model(self):
         bp = ModelBlueprint('test', 'markers', 'xgb', None)
@@ -48,4 +50,21 @@ class TestSchema:
                      ('test121', 2),
                      ]
 
+    def test_create_data_map(self):
+        bps = [
+            ModelBlueprint('all-events', ['a', 'b'], 'xgb', None),
+            ModelBlueprint('n1', ['a', 'b'], 'xgb', 'all-events'),
+        ]
+        schema = GridSchema(bps)
 
+        x_train = pd.DataFrame([[1, 2], [3, 4], [5, 6], [7, 8]],
+                               columns=list('ab'))
+        y_train = pd.DataFrame([['n1', 'n11'], ['n2', ''],
+                                ['n2', ''], ['n1', 'n12']], columns=['x1', 'x2'])
+        data_map = schema.create_data_map(x_train, y_train)
+
+        assert_series_equal(data_map['all-events'][1],
+                            pd.Series(['n1', 'n2', 'n2', 'n1'], name='x1'))
+        assert_series_equal(data_map['n1'][1],
+                            pd.Series(['n11', 'n12'], name='x2', index=[0, 3])
+                            )
