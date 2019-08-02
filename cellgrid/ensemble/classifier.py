@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pickle
 
+
 class GridClassifier:
     def __init__(self, schema):
         self.schema = schema
@@ -41,7 +42,6 @@ class GridClassifier:
                 df.loc[y.index, level_label] = y
 
         return df.replace(np.nan, ' ')
-
 
 
 def save_model(model, path):

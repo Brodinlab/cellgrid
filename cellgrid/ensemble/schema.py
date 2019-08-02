@@ -79,7 +79,8 @@ class GridSchema(Schema):
         if model.parent in self._model_dict:
             self._model_dict[model.parent]['children'].append(model.name)
         else:
-            self._model_dict[model.parent] = {'node': None, 'children': [model.name]}
+            self._model_dict[model.parent] = {'node': None,
+                                              'children': [model.name]}
 
         if model.name in self._model_dict:
             self._model_dict[model.name]['model'] = model
@@ -132,4 +133,3 @@ class GridSchema(Schema):
             children = self._model_dict[name]['children']
             if len(children) > 0:
                 self.build(level=level + 1, models=children)
-
