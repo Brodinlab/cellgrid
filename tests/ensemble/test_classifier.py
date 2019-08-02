@@ -11,25 +11,19 @@ y_train = None
 
 @pytest.fixture(scope="module", autouse=True)
 def fit():
-    f = os.path.join(os.getcwd(),
-                     'tests', 'cellgrid_test.csv')
+    dir_ = os.path.dirname(os.path.abspath(__file__))
+    f = os.path.join(dir_, 'cellgrid_test.csv')
     df = pd.read_csv(f)
     global clf, x_train, y_train
 
     y_train = df[['level0', 'level1', 'level2']]
     x_train = df.drop(['level0', 'level1', 'level2'], axis=1)
-    schema = Schema.from_json()
+    schema = GridSchema.from_json()
     clf = GridClassifier(schema)
     clf.fit(x_train, y_train)
 
 
-class TestSchema:
-    def test_from_json(self):
-        schema = Schema.from_json()
-        assert isinstance(schema, Schema)
-        assert len(schema.get()) == 8
-        assert schema.get()[0]['parent'] is None
-
+class TestClassifier:
     def test_fit(self):
         r = clf.score(x_train, y_train)
         assert list(r.keys()) == ['all-events', 'cells', 'B', 'CD4T',

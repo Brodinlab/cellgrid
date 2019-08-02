@@ -1,42 +1,47 @@
-import os
-import json
+import numpy as np
+import pandas as pd
 import pickle
-from .node import NodesTrainer
-
 
 class GridClassifier:
     def __init__(self, schema):
-        self.nt = NodesTrainer(schema)
-        self.nt.schema_to_nodes()
+        self.schema = schema
 
     def fit(self, x_train, y_train):
-        self.nt.update_node_data(x_train, y_train)
-        self.nt.fit()
+        data_map = self.schema.create_data_map(x_train, y_train)
+        for model in self.schema.walk():
+            x, y = data_map[model.name]
+            model.fit(x, y)
 
     def score(self, x_test, y_test):
-        self.nt.update_node_data(x_test, y_test)
-        return self.nt.score()
+        r = dict()
+        data_map = self.schema.create_data_map(x_test, y_test)
+        for model in self.schema.walk():
+            x, y = data_map[model.name]
+            r[model.name] = model.score(x, y)
+        return r
 
     def predict(self, x):
-        return self.nt.predict(x)
+        df = pd.DataFrame([])
+        for model in self.schema.walk():
+            parent_level_label = 'level{}'.format(model.level - 1)
 
+            if parent_level_label in df:
+                col = df[parent_level_label]
+                index = col[col == model.name].index
+            else:
+                index = x.index
 
-class Schema:
-    def __init__(self, schema):
-        self.__schema = schema
+            y = pd.Series(model.predict(x.loc[index]),
+                          index=index)
 
-    def get(self):
-        return self.__schema
+            level_label = 'level{}'.format(model.level)
+            if index.shape == x.index.shape:
+                df[level_label] = y
+            else:
+                df.loc[y.index, level_label] = y
 
-    @classmethod
-    def from_json(cls, filepath=None):
-        if filepath is None:
-            filepath = os.path.join(os.getcwd(), 'cellgrid',
-                                    'ensemble', 'schema.json')
+        return df.replace(np.nan, ' ')
 
-        with open(filepath, 'rb') as fp:
-            schema = json.load(fp)
-        return Schema(schema)
 
 
 def save_model(model, path):
