@@ -1,17 +1,27 @@
-from sklearn.metrics import confusion_matrix, f1_score
-from cellgrid.model_selection import Evaluator
+from cellgrid.model_selection import *
 from .conftest import Clf4Test
 
 
 class TestEvaluator:
-    def test_run(self):
+    def test_f1(self):
         c4t = Clf4Test()
-        clf, x_train, y_train = [c4t.clf, c4t.x_train, c4t.y_train]
-        n = y_train.iloc[:, -1].unique().shape[0]
-        eva = Evaluator(clf, f1_score)
-        r = eva.run(x_train, y_train, average=None)
+        n = c4t.y_train.iloc[:, -1].unique().shape[0]
+        eva = Evaluator(c4t.clf, F1score())
+        r = eva.run(c4t.x_train, c4t.y_train, average=None)
         assert len(r) == n
 
-        eva = Evaluator(clf, confusion_matrix)
-        r = eva.run(x_train, y_train)
+    def test_confusion_matrix(self):
+        c4t = Clf4Test()
+        n = c4t.y_train.iloc[:, -1].unique().shape[0]
+        eva = Evaluator(c4t.clf, ConfusionMatrix())
+        r = eva.run(c4t.x_train, c4t.y_train,
+                    labels=c4t.y_train.iloc[:, -1].unique())
         assert r.shape == (n, n)
+
+    def test_precision_recall_curve(self):
+        c4t = Clf4Test()
+        prc = PrecisionRecallCurve()
+        eva = Evaluator(c4t.clf, prc)
+        r = eva.run(c4t.x_train, c4t.y_train)
+        assert len(r) == 3
+
