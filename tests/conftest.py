@@ -2,6 +2,7 @@ import os
 import pytest
 import pandas as pd
 from cellgrid.ensemble import *
+from cellgrid.ensemble.schema import GridSchema
 
 
 class Clf4Test:

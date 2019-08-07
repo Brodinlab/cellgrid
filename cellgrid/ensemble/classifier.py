@@ -1,6 +1,12 @@
+import abc
+from collections import namedtuple
 import numpy as np
 import pandas as pd
 import pickle
+from sklearn.metrics import check_scoring
+
+ModelBlueprint = namedtuple('ModelBlueprint',
+                            ['name', 'markers', 'model_class_name', 'parent'])
 
 
 class GridClassifier:
@@ -86,3 +92,65 @@ def load_model(path):
     with open(path, 'rb') as fp:
         model = pickle.load(fp)
     return model
+
+
+class Schema(abc.ABC):
+    def __init__(self, model_blueprints):
+        self._ready = False
+        self._model_dict = {None: {'model': None, 'children': []}}
+        for bp in model_blueprints:
+            model = self.create_model(bp)
+            self.add_model(model)
+        self.build()
+
+    @property
+    def ready(self):
+        return self._ready
+
+    @classmethod
+    @abc.abstractmethod
+    def create_model(cls, bp):
+        pass
+
+    @abc.abstractmethod
+    def add_model(self, model):
+        pass
+
+    @abc.abstractmethod
+    def build(self):
+        """
+        Finish for adding models and set ready flag to true
+        :return:
+        """
+
+    @abc.abstractmethod
+    def walk(self):
+        """
+        Walk through and return each model
+        :return:
+        """
+        pass
+
+
+class Model(abc.ABC):
+    def __init__(self, name, markers, parent, level=None, **kwargs):
+        self.name = name
+        self.markers = markers
+        self.parent = parent
+        self.level = level
+        self._model_ins = self.init_model_instance(**kwargs)
+
+    @abc.abstractmethod
+    def init_model_instance(self, **kwargs):
+        pass
+
+    def fit(self, x_train, y_train):
+        self._model_ins.fit(x_train[self.markers], y_train)
+
+    def score(self, x_train, y_train):
+        return check_scoring(self._model_ins)(self._model_ins,
+                                              x_train[self.markers],
+                                              y_train)
+
+    def predict(self, x):
+        return self._model_ins.predict(x[self.markers])

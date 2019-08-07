@@ -1,4 +1,5 @@
-from cellgrid.ensemble import GridSchema, ModelBlueprint
+from cellgrid.ensemble import ModelBlueprint
+from cellgrid.ensemble.schema import GridSchema
 from cellgrid.ensemble.model import XgbModel
 
 

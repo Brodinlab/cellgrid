@@ -1,49 +1,7 @@
 import os
 import json
-import abc
-from collections import namedtuple
+from .classifier import ModelBlueprint, Schema
 from .model import XgbModel
-
-ModelBlueprint = namedtuple('ModelBlueprint',
-                            ['name', 'markers', 'model_class_name', 'parent'])
-
-
-class Schema(abc.ABC):
-    def __init__(self, model_blueprints):
-        self._ready = False
-        self._model_dict = {None: {'model': None, 'children': []}}
-        for bp in model_blueprints:
-            model = self.create_model(bp)
-            self.add_model(model)
-        self.build()
-
-    @property
-    def ready(self):
-        return self._ready
-
-    @classmethod
-    @abc.abstractmethod
-    def create_model(cls, bp):
-        pass
-
-    @abc.abstractmethod
-    def add_model(self, model):
-        pass
-
-    @abc.abstractmethod
-    def build(self):
-        """
-        Finish for adding models and set ready flag to true
-        :return:
-        """
-
-    @abc.abstractmethod
-    def walk(self):
-        """
-        Walk through and return each model
-        :return:
-        """
-        pass
 
 
 class GridSchema(Schema):
