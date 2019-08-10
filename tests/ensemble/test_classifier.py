@@ -6,6 +6,20 @@ from cellgrid.model_selection import Evaluator, F1score
 from ..conftest import Clf4Test
 
 
+class TestSchema:
+    def test_from_json(self):
+        schema = GridSchema.from_json()
+        assert isinstance(schema, GridSchema)
+
+    def test_create_model(self):
+        bp = ModelBlueprint('test', 'markers', 'xgb', None)
+        xgb = GridSchema.create_model(bp)
+        assert isinstance(xgb, XgbModel)
+        assert xgb._model_ins.n_jobs == 10
+        assert xgb._model_ins.max_depth == 10
+        assert xgb._model_ins.n_estimators == 40
+
+
 class TestClassifier:
     def test_fit(self):
         c4t = Clf4Test()
@@ -33,22 +47,6 @@ class TestClassifier:
                                       'CD8T', 'Monocytes', 'NK', 'gdT']
             for v in r.values():
                 assert v > 0.9
-
-
-class TestDataMapper:
-    def test_create_data_map(self):
-        x_train = pd.DataFrame([[1, 2], [3, 4], [5, 6], [7, 8]],
-                               columns=list('ab'))
-        y_train = pd.DataFrame([['n1', 'n11'], ['n2', ''],
-                                ['n2', ''], ['n1', 'n12']], columns=['x1', 'x2'])
-        dm = DataMapper()
-        data_map = dm.create_data_map(x_train, y_train)
-
-        assert_series_equal(data_map['all-events'][1],
-                            pd.Series(['n1', 'n2', 'n2', 'n1'], name='x1'))
-        assert_series_equal(data_map['n1'][1],
-                            pd.Series(['n11', 'n12'], name='x2', index=[0, 3])
-                            )
 
 
 class TestClfPerformance:

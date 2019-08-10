@@ -1,86 +1,90 @@
-import abc
-from collections import namedtuple
-import numpy as np
+import os
 import pandas as pd
+import numpy as np
 import pickle
-from sklearn.metrics import check_scoring
+import json
+from ..core import AbsDataFrame, AbsSeries, Classifier, Schema, ModelBlueprint
+from .model import XgbModel
 
-ModelBlueprint = namedtuple('ModelBlueprint',
-                            ['name', 'markers', 'model_class_name', 'parent'])
+
+class DataFrame(AbsDataFrame):
+    def __init__(self, df=None):
+        if df is None:
+            df = pd.DataFrame([])
+        self.df = df
+
+    @property
+    def index(self):
+        return list(self.df.index)
+
+    @property
+    def columns(self):
+        return list(self.df.columns)
+
+    @property
+    def values(self):
+        return self.df.values
+
+    def get_col_series(self, name, index=None):
+        assert type(name) == str
+        if index is None:
+            s = self.df[name]
+        else:
+            s = self.df.loc[list(index), name]
+        return Series(s.values, index=s.index, name=s.name)
+
+    def loc(self, index=None, columns=None):
+        if index is None and columns is None:
+            return DataFrame(self.df)
+        elif index is not None and columns is not None:
+            return DataFrame(self.df.loc[list(index), list(columns)])
+        elif index is not None:
+            return DataFrame(self.df.loc[list(index)])
+        else:
+            return DataFrame(self.df[list(columns)])
+
+    def set_col(self, col_name, series):
+        if col_name in self.df:
+            self.df.loc[series.index, col_name] = series.values
+        else:
+            dfs = pd.DataFrame(series.values,
+                               index=series.index,
+                               columns=[col_name])
+            self.df = pd.concat([self.df, dfs], axis=1)
+
+
+class Series(AbsSeries):
+    def __init__(self, values, index=None, name=None):
+        self.s = pd.Series(values, index=index, name=name)
+
+    @property
+    def index(self):
+        return list(self.s.index)
+
+    @property
+    def values(self):
+        return list(self.s.values)
+
+    def get_item_index(self, item):
+        return list(self.s[self.s == item].index)
+
+    def unique(self):
+        return list(self.s.unique())
 
 
 class GridClassifier:
     def __init__(self, schema):
-        self.schema = schema
+        self.clf = Classifier(schema)
 
     def fit(self, x_train, y_train):
-        dm = DataMapper()
-        data_map = dm.create_data_map(x_train, y_train)
-        for model in self.schema.walk():
-            x, y = data_map[model.name]
-            model.fit(x, y)
+        return self.clf.fit(DataFrame(x_train), DataFrame(y_train))
 
     def score(self, x_test, y_test):
-        r = dict()
-        dm = DataMapper()
-        data_map = dm.create_data_map(x_test, y_test)
-        for model in self.schema.walk():
-            x, y = data_map[model.name]
-            r[model.name] = model.score(x, y)
-        return r
+        return self.clf.score(DataFrame(x_test), DataFrame(y_test))
 
     def predict(self, x):
-        df = pd.DataFrame([])
-        for model in self.schema.walk():
-            parent_level_label = 'level{}'.format(model.level - 1)
-
-            if parent_level_label in df:
-                col = df[parent_level_label]
-                index = col[col == model.name].index
-            else:
-                index = x.index
-
-            y = pd.Series(model.predict(x.loc[index]),
-                          index=index)
-
-            level_label = 'level{}'.format(model.level)
-            if index.shape == x.index.shape:
-                df[level_label] = y
-            else:
-                df.loc[y.index, level_label] = y
-
-        return df.replace(np.nan, ' ')
-
-
-class DataMapper:
-    def create_data_map(self, x_train, y_train):
-        r = dict()
-        blocks = [
-            {'name': 'all-events',
-             'index': y_train.index,
-             'parent': None}
-        ]
-        for column in y_train:
-            new_blocks = list()
-            for block in blocks:
-                x_train_block = x_train.loc[block['index']]
-                y_train_block = y_train.loc[block['index'], column]
-                if len(y_train_block.unique()) != 1:
-                    r[block['name']] = x_train_block, y_train_block
-                new_blocks += self.__create_new_block(y_train_block,
-                                                      block['parent'])
-            blocks = new_blocks
-        return r
-
-    def __create_new_block(self, y_train, parent):
-        series_y = y_train
-        blocks = list()
-        for name in series_y.unique():
-            index = series_y[series_y == name].index
-            blocks.append({'name': name,
-                           'index': index,
-                           'parent': parent})
-        return blocks
+        df = self.clf.predict(DataFrame(x), DataFrame, Series)
+        return df.df.replace(np.nan, ' ')
 
 
 def save_model(model, path):
@@ -94,63 +98,25 @@ def load_model(path):
     return model
 
 
-class Schema(abc.ABC):
-    def __init__(self, model_blueprints):
-        self._ready = False
-        self._model_dict = {None: {'model': None, 'children': []}}
-        for bp in model_blueprints:
-            model = self.create_model(bp)
-            self.add_model(model)
-        self.build()
+class GridSchema(Schema):
+    @classmethod
+    def from_json(cls, filepath=None):
+        if filepath is None:
+            dir_ = os.path.dirname(os.path.abspath(__file__))
+            filepath = os.path.join(dir_, 'schema.json')
 
-    @property
-    def ready(self):
-        return self._ready
+        with open(filepath, 'rb') as fp:
+            items = json.load(fp)
+
+        bps = list()
+        for i in items:
+            bps.append(ModelBlueprint(**i))
+        return GridSchema(bps)
 
     @classmethod
-    @abc.abstractmethod
     def create_model(cls, bp):
-        pass
-
-    @abc.abstractmethod
-    def add_model(self, model):
-        pass
-
-    @abc.abstractmethod
-    def build(self):
-        """
-        Finish for adding models and set ready flag to true
-        :return:
-        """
-
-    @abc.abstractmethod
-    def walk(self):
-        """
-        Walk through and return each model
-        :return:
-        """
-        pass
-
-
-class Model(abc.ABC):
-    def __init__(self, name, markers, parent, level=None, **kwargs):
-        self.name = name
-        self.markers = markers
-        self.parent = parent
-        self.level = level
-        self._model_ins = self.init_model_instance(**kwargs)
-
-    @abc.abstractmethod
-    def init_model_instance(self, **kwargs):
-        pass
-
-    def fit(self, x_train, y_train):
-        self._model_ins.fit(x_train[self.markers], y_train)
-
-    def score(self, x_train, y_train):
-        return check_scoring(self._model_ins)(self._model_ins,
-                                              x_train[self.markers],
-                                              y_train)
-
-    def predict(self, x):
-        return self._model_ins.predict(x[self.markers])
+        model_map = {
+            'xgb': XgbModel
+        }
+        model_class = model_map[bp.model_class_name]
+        return model_class(bp.name, bp.markers, bp.parent)

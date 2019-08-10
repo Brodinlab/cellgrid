@@ -2,7 +2,7 @@ import os
 import pytest
 import pandas as pd
 from cellgrid.ensemble import *
-from cellgrid.ensemble.schema import GridSchema
+
 
 
 class Clf4Test:
@@ -62,4 +62,4 @@ def fit():
     clf = GridClassifier(schema)
     clf.fit(x_train, y_train)
     Clf4Test(clf=clf, x_train=x_train, y_train=y_train,
-             x_test=x_test, y_test=y_test)
+            x_test=x_test, y_test=y_test)

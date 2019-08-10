@@ -1,5 +1,5 @@
 from xgboost import XGBClassifier
-from .classifier import Model
+from ..core import Model
 
 
 class XgbModel(Model):
