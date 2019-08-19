@@ -26,12 +26,12 @@ This schema is defined as a list in a json,
 in which each element contains:
     * **name**.
     * **parent**. Name of the parent model.
-    * **model_class_name**: Name of the The base model class. 
+    * **model_class_name**. Name of the The base model class. 
     The following options are supported:
         * xgb
         * random-forest
         * linear-regression
-    * **markers**: The markers that are used for training the model.
+    * **markers**. The markers that are used for training the model.
     * For example:
 
     ```json
@@ -122,7 +122,7 @@ Train the classifier
 
 ###### Arguments
 * x_train: The single cell dataset. 
-* y_train: The layered labels.
+* y_train: The labels in a hierarchical structure.
 An example:
 
 
@@ -138,7 +138,7 @@ An example:
 ```python
 predict(x)
 ```
-Predict the layered labels for dataset ```x```
+Predict the hierarchical labels for dataset ```x```
 
 ##### score
 ```python
