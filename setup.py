@@ -5,12 +5,6 @@
 
 from setuptools import setup, find_packages
 
-with open('README.md') as readme_file:
-    readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 requirements = [
     'fcsy>=0.3.0',
     'numpy>=1.16.0',
@@ -42,7 +36,7 @@ setup(
     description="Cell classification by learning known phenotypes",
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + '\n\n' + history,
+    long_description='',
     include_package_data=True,
     keywords='cellgrid',
     name='cellgrid',
