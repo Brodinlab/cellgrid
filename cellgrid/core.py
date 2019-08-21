@@ -69,7 +69,7 @@ class Classifier:
         return r
 
     def predict(self, x, data_frame_class, series_class):
-        df = data_frame_class()
+        df = data_frame_class([])
         for model in self.schema.walk():
             parent_level_label = 'level{}'.format(model.level - 1)
 
@@ -87,6 +87,10 @@ class Classifier:
 
 
 class AbsDataFrame(abc.ABC):
+    @abc.abstractmethod
+    def __init__(self, data, columns=None, index=None):
+        pass
+
     @property
     @abc.abstractmethod
     def columns(self):
@@ -104,18 +108,26 @@ class AbsDataFrame(abc.ABC):
 
     @abc.abstractmethod
     def get_col_series(self, name, index=None):
-        return AbsSeries()
+        pass
 
     @abc.abstractmethod
     def loc(self, index=None, columns=None):
-        return AbsDataFrame()
+        pass
 
     @abc.abstractmethod
     def set_col(self, col_name, series):
         pass
 
+    @abc.abstractmethod
+    def drop(self, names, axis):
+        pass
+
 
 class AbsSeries(abc.ABC):
+    @abc.abstractmethod
+    def __init__(self, values, index=None, name=None):
+        pass
+
     @property
     @abc.abstractmethod
     def index(self):
@@ -132,6 +144,10 @@ class AbsSeries(abc.ABC):
 
     @abc.abstractmethod
     def unique(self):
+        pass
+
+    @abc.abstractmethod
+    def drop(self, names):
         pass
 
 
@@ -157,6 +173,23 @@ class DataMapper:
                                                       block['parent'])
             blocks = new_blocks
         return r
+
+    def loop_blocks(self, y_train):
+        blocks_all = [
+            {'name': 'all-events',
+             'index': y_train.index,
+             'parent': None}
+        ]
+        blocks = blocks_all.copy()
+        for column in y_train.columns:
+            new_blocks = list()
+            for block in blocks:
+                y_train_block = y_train.get_col_series(column,
+                                                       index=block['index'])
+                yield column, block, y_train_block
+                new_blocks += self.__create_new_block(y_train_block,
+                                                      block['parent'])
+            blocks = new_blocks
 
     def __create_new_block(self, y_train, parent):
         series_y = y_train
@@ -194,3 +227,51 @@ class Model(abc.ABC):
 
     def predict(self, x):
         return self._model_ins.predict(self.filter_x(x).values)
+
+
+class EvaMethod(abc.ABC):
+    def __init__(self, data_frame_class, series_class):
+        self.data_frame_class = data_frame_class
+        self.series_class = series_class
+
+    def run(self, y_test, y_pred, **kwargs):
+        r = dict()
+        dm = DataMapper()
+        for column, block, y_test_block in dm.loop_blocks(y_test):
+            if len(y_test_block.unique()) != 1:
+                y_pred_block = y_pred.get_col_series(column,
+                                                     index=block['index'])
+                labels = y_pred_block.unique()
+                kwargs_block = {'labels': labels}
+                kwargs_block.update(kwargs)
+                score = self.meta_method(y_test_block.values,
+                                         y_pred_block.values,
+                                         **kwargs_block
+                                         )
+                r[block['name']] = self.clean(y_test_block,
+                                              y_pred_block,
+                                              score)
+        return r
+
+    def clean(self, y_true, y_pred, score):
+        to_remove = list(set(y_pred.unique()) - set(y_true.unique()))
+        labels = y_pred.unique()
+
+        if score.ndim == 1:
+            s = self.series_class(score, index=labels)
+            s = s.drop(to_remove)
+            return {'labels': s.index,
+                    'scores': s.values}
+        if score.ndim == 2:
+            df = self.data_frame_class(score,
+                                       columns=labels,
+                                       index=labels)
+            df = df.drop(to_remove, axis=0)
+            df = df.drop(to_remove, axis=1)
+            return {'labels': df.columns,
+                    'scores': df.values}
+
+    @property
+    @abc.abstractmethod
+    def meta_method(self):
+        pass

@@ -49,6 +49,23 @@ class TestClassifier:
                 assert v > 0.9
 
 
+class TestSeries:
+    def test_replace(self):
+        name = 'test',
+        index = [5, 6, 7]
+        s1 = Series([1, 2, 1],
+                    name=name, index=index)
+        s2 = s1.replace(1, 3)
+        expect = pd.Series([3, 2, 3],
+                           name=name, index=index)
+        assert_series_equal(s2.s, expect)
+
+        s3 = s1.replace([1, 2], 5)
+        expect = pd.Series([5, 5, 5],
+                           name=name, index=index)
+        assert_series_equal(s3.s, expect)
+
+
 class TestClfPerformance:
     def test_on_test_dataset(self):
         c4t = Clf4Test()

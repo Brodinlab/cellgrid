@@ -5,23 +5,12 @@ from .conftest import Clf4Test
 class TestEvaluator:
     def test_f1(self):
         c4t = Clf4Test()
-        n = c4t.y_train.iloc[:, -1].unique().shape[0]
         eva = Evaluator(c4t.clf, F1score())
-        r = eva(c4t.x_train, c4t.y_train, average=None)
-        assert len(r) == n
+        r = eva(c4t.x_test, c4t.y_test, average=None)
+        assert len(r) == 8
 
     def test_confusion_matrix(self):
         c4t = Clf4Test()
-        n = c4t.y_train.iloc[:, -1].unique().shape[0]
         eva = Evaluator(c4t.clf, ConfusionMatrix())
-        r = eva(c4t.x_train, c4t.y_train,
-                    labels=c4t.y_train.iloc[:, -1].unique())
-        assert r.shape == (n, n)
-
-    def test_precision_recall_curve(self):
-        c4t = Clf4Test()
-        prc = PrecisionRecallCurve()
-        eva = Evaluator(c4t.clf, prc)
-        r = eva(c4t.x_train, c4t.y_train)
-        assert len(r) == 3
-
+        r = eva(c4t.x_test, c4t.y_test)
+        assert len(r) == 8

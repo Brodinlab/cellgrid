@@ -81,7 +81,7 @@ class TestDataFrameAndSeries:
         assert isinstance(df_loc4, DataFrame)
 
     def test_empty_df_set_col(self):
-        df = DataFrame()
+        df = DataFrame([])
         s = Series(([11, 13]), name='x', index=[0, 2])
         df.set_col('a', s)
         assert_frame_equal(df.df, pd.DataFrame([[11], [13]], columns=['a'], index=[0, 2]))
@@ -104,13 +104,18 @@ class TestDataFrameAndSeries:
 
 class TestDataMapper:
     def test_create_data_map(self):
-        x_train = pd.DataFrame([[1, 2], [3, 4], [5, 6], [7, 8]],
+        print('#########')
+        x_train = pd.DataFrame([[1, 2],
+                                [3, 4],
+                                [5, 6],
+                                [7, 8]],
                                columns=list('ab'))
-        y_train = pd.DataFrame([['n1', 'n11'], ['n2', ''],
-                                ['n2', ''], ['n1', 'n12']], columns=['x1', 'x2'])
+        y_train = pd.DataFrame([['n1', 'n11'],
+                                ['n2', ''],
+                                ['n2', ''],
+                                ['n1', 'n12']], columns=['x1', 'x2'])
         dm = DataMapper()
         data_map = dm.create_data_map(DataFrame(x_train), DataFrame(y_train))
-
         assert_frame_equal(data_map['all-events'][0].df, x_train)
         assert_series_equal(data_map['all-events'][1].s,
                             pd.Series(['n1', 'n2', 'n2', 'n1'], name='x1'))
@@ -121,3 +126,16 @@ class TestDataMapper:
                             pd.Series(['n11', 'n12'], name='x2', index=[0, 3])
                             )
 
+    def test_loop_blocks(self):
+        y_train = pd.DataFrame([['n1', 'n11'], ['n2', ''],
+                                ['n2', ''], ['n1', 'n12']], columns=['x1', 'x2'])
+        dm = DataMapper()
+        r = list()
+        for _, block, _ in dm.loop_blocks(DataFrame(y_train)):
+            r.append(block)
+        expect = [
+            {'name': 'all-events', 'index': [0, 1, 2, 3], 'parent': None},
+            {'name': 'n1', 'index': [0, 3], 'parent': None},
+            {'name': 'n2', 'index': [1, 2], 'parent': None},
+        ]
+        assert r == expect

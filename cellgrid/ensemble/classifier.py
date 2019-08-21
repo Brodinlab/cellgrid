@@ -8,10 +8,17 @@ from .model import XgbModel
 
 
 class DataFrame(AbsDataFrame):
-    def __init__(self, df=None):
-        if df is None:
-            df = pd.DataFrame([])
-        self.df = df
+    def __init__(self, data, columns=None, index=None):
+        self.df = pd.DataFrame(data,
+                               columns=columns,
+                               index=index)
+
+    @classmethod
+    def from_pd_df(cls, df):
+        return DataFrame(df.values,
+                         columns=df.columns,
+                         index=df.index
+                         )
 
     @property
     def index(self):
@@ -37,11 +44,11 @@ class DataFrame(AbsDataFrame):
         if index is None and columns is None:
             return DataFrame(self.df)
         elif index is not None and columns is not None:
-            return DataFrame(self.df.loc[list(index), list(columns)])
+            return DataFrame.from_pd_df(self.df.loc[list(index), list(columns)])
         elif index is not None:
-            return DataFrame(self.df.loc[list(index)])
+            return DataFrame.from_pd_df(self.df.loc[list(index)])
         else:
-            return DataFrame(self.df[list(columns)])
+            return DataFrame.from_pd_df(self.df[list(columns)])
 
     def set_col(self, col_name, series):
         if col_name in self.df:
@@ -52,10 +59,18 @@ class DataFrame(AbsDataFrame):
                                columns=[col_name])
             self.df = pd.concat([self.df, dfs], axis=1)
 
+    def drop(self, names, axis):
+        df = self.df.drop(names, axis=axis)
+        return DataFrame.from_pd_df(df)
+
 
 class Series(AbsSeries):
     def __init__(self, values, index=None, name=None):
         self.s = pd.Series(values, index=index, name=name)
+
+    @classmethod
+    def from_pd_series(cls, s):
+        return Series(s.values, index=s.index, name=s.name)
 
     @property
     def index(self):
@@ -71,19 +86,31 @@ class Series(AbsSeries):
     def unique(self):
         return list(self.s.unique())
 
+    def replace(self, to_replace, value):
+        s = self.s.replace(to_replace, value)
+        return Series(s.values, index=s.index,
+                      name=s.name)
+
+    def drop(self, names):
+        return Series.from_pd_series(self.s.drop(names))
+
 
 class GridClassifier:
     def __init__(self, schema):
         self.clf = Classifier(schema)
 
     def fit(self, x_train, y_train):
-        return self.clf.fit(DataFrame(x_train), DataFrame(y_train))
+        return self.clf.fit(DataFrame.from_pd_df(x_train),
+                            DataFrame.from_pd_df(y_train))
 
     def score(self, x_test, y_test):
-        return self.clf.score(DataFrame(x_test), DataFrame(y_test))
+        return self.clf.score(DataFrame.from_pd_df(x_test),
+                              DataFrame.from_pd_df(y_test))
 
     def predict(self, x):
-        df = self.clf.predict(DataFrame(x), DataFrame, Series)
+        df = self.clf.predict(DataFrame.from_pd_df(x),
+                              DataFrame,
+                              Series)
         return df.df.replace(np.nan, ' ')
 
 
