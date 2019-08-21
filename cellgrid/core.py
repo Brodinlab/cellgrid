@@ -154,40 +154,28 @@ class AbsSeries(abc.ABC):
 class DataMapper:
     def create_data_map(self, x_train, y_train):
         r = dict()
-        blocks = [
-            {'name': 'all-events',
-             'index': y_train.index,
-             'parent': None}
-        ]
-        for column in y_train.columns:
-            new_blocks = list()
-            for block in blocks:
-                # x_train_block = x_train.loc(block['index'],
-                # schema.get(block['name'])
-                x_train_block = x_train.loc(block['index'])
-                y_train_block = y_train.get_col_series(column,
-                                                       index=block['index'])
-                if len(y_train_block.unique()) != 1:
-                    r[block['name']] = x_train_block, y_train_block
-                new_blocks += self.__create_new_block(y_train_block,
-                                                      block['parent'])
-            blocks = new_blocks
+        for column, block, y_test_block in self.loop_blocks(y_train):
+            x_train_block = x_train.loc(block['index'])
+            y_train_block = y_train.get_col_series(column,
+                                                   index=block['index'])
+            if len(y_train_block.unique()) != 1:
+                r[block['name']] = x_train_block, y_train_block
         return r
 
-    def loop_blocks(self, y_train):
+    def loop_blocks(self, y):
         blocks_all = [
             {'name': 'all-events',
-             'index': y_train.index,
+             'index': y.index,
              'parent': None}
         ]
         blocks = blocks_all.copy()
-        for column in y_train.columns:
+        for column in y.columns:
             new_blocks = list()
             for block in blocks:
-                y_train_block = y_train.get_col_series(column,
-                                                       index=block['index'])
-                yield column, block, y_train_block
-                new_blocks += self.__create_new_block(y_train_block,
+                y_block = y.get_col_series(column,
+                                           index=block['index'])
+                yield column, block, y_block
+                new_blocks += self.__create_new_block(y_block,
                                                       block['parent'])
             blocks = new_blocks
 
@@ -203,7 +191,8 @@ class DataMapper:
 
 
 class Model(abc.ABC):
-    def __init__(self, name, markers, parent, level=None, **kwargs):
+    def __init__(self, name, markers, parent,
+                 level=None, **kwargs):
         self.name = name
         self.markers = markers
         self.parent = parent
@@ -234,21 +223,21 @@ class EvaMethod(abc.ABC):
         self.data_frame_class = data_frame_class
         self.series_class = series_class
 
-    def run(self, y_test, y_pred, **kwargs):
+    def run(self, y_true, y_pred, **kwargs):
         r = dict()
         dm = DataMapper()
-        for column, block, y_test_block in dm.loop_blocks(y_test):
-            if len(y_test_block.unique()) != 1:
+        for column, block, y_true_block in dm.loop_blocks(y_true):
+            if len(y_true_block.unique()) != 1:
                 y_pred_block = y_pred.get_col_series(column,
                                                      index=block['index'])
                 labels = y_pred_block.unique()
                 kwargs_block = {'labels': labels}
                 kwargs_block.update(kwargs)
-                score = self.meta_method(y_test_block.values,
+                score = self.meta_method(y_true_block.values,
                                          y_pred_block.values,
                                          **kwargs_block
                                          )
-                r[block['name']] = self.clean(y_test_block,
+                r[block['name']] = self.clean(y_true_block,
                                               y_pred_block,
                                               score)
         return r
