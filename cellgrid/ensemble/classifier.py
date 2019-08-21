@@ -44,7 +44,8 @@ class DataFrame(AbsDataFrame):
         if index is None and columns is None:
             return DataFrame(self.df)
         elif index is not None and columns is not None:
-            return DataFrame.from_pd_df(self.df.loc[list(index), list(columns)])
+            return DataFrame.from_pd_df(self.df.loc[list(index),
+                                                    list(columns)])
         elif index is not None:
             return DataFrame.from_pd_df(self.df.loc[list(index)])
         else:

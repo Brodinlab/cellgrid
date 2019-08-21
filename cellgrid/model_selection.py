@@ -1,6 +1,4 @@
-import abc
-from sklearn.metrics import confusion_matrix, f1_score, precision_recall_curve
-from sklearn.preprocessing import label_binarize
+from sklearn.metrics import confusion_matrix, f1_score
 from .ensemble.classifier import DataFrame, Series
 from .core import EvaMethod
 
@@ -35,5 +33,3 @@ class ConfusionMatrix(EvaMethod):
     @property
     def meta_method(self):
         return confusion_matrix
-
-
