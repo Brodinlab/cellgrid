@@ -7,8 +7,8 @@ from setuptools import setup, find_packages
 
 requirements = [
     'fcsy>=0.3.0',
-    'numpy>=1.16.0',
-    'pandas==0.24.2',
+    'numpy>=1.15.4',
+    'pandas>=0.24.2',
     'scikit-learn',
     'xgboost>=0.9.0'
 ]
@@ -45,6 +45,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Brodinlab/cellgrid',
-    version='0.5.5',
+    version='0.5.6',
     zip_safe=False,
 )
