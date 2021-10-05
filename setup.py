@@ -6,11 +6,11 @@
 from setuptools import setup, find_packages
 
 requirements = [
-    'fcsy>=0.3.0',
-    'numpy>=1.15.4',
-    'pandas>=0.24.2',
-    'scikit-learn',
-    'xgboost>=0.9.0'
+    'fcsy==0.4.0',
+    'numpy==1.21.2',
+    'pandas==1.3.2',
+    'scikit-learn==0.24.2',
+    'xgboost==1.4.2'
 ]
 
 setup_requirements = ['pytest-runner', ]
@@ -45,6 +45,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Brodinlab/cellgrid',
-    version='0.5.6',
+    version='0.6.0',
     zip_safe=False,
 )
