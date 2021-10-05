@@ -3,8 +3,8 @@
 <a href="https://pypi.python.org/pypi/cellgrid">
 <img src="https://img.shields.io/pypi/v/cellgrid.svg">
 </a>
-<a href="https://travis-ci.org/Brodinlab/cellgrid">
-<img src="https://travis-ci.org/Brodinlab/cellgrid.svg?branch=master">
+<a href="https://github.com/Brodinlab/cellgrid/workflows/Python%20package">
+<img src="https://github.com/Brodinlab/cellgrid/workflows/Python%20package/badge.svg">
 </a>
 
 Cell classification by learning known phenotypes
