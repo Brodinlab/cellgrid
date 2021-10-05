@@ -10,7 +10,7 @@ requirements = [
     'numpy==1.21.2',
     'pandas==1.3.2',
     'scikit-learn==0.24.2',
-    'xgboost==1.4.2'
+    'xgboost>=0.90'
 ]
 
 setup_requirements = ['pytest-runner', ]
@@ -42,6 +42,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Brodinlab/cellgrid',
-    version='0.6.0',
+    version='0.6.1',
     zip_safe=False,
 )
