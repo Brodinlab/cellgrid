@@ -9,7 +9,7 @@ requirements = [
     'fcsy==0.4.0',
     'numpy==1.21.2',
     'pandas==1.3.2',
-    'scikit-learn==0.24.2',
+    'scikit-learn==1.0.1',
     'xgboost>=0.90'
 ]
 
